@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cotizador - GRUPO MOYA PERÚ</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @media print {
+            .no-print { display: none !important; }
+            .print-only { display: block !important; }
+            body { background-color: white; }
+            .container { max-width: 100%; width: 100%; padding: 0; margin: 0; }
+            .shadow-lg { shadow: none; }
+        }
+        .print-only { display: none; }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen font-sans">
+
+    <div class="container mx-auto p-4 md:p-8 max-w-5xl">
+        <!-- Header -->
+        <header class="bg-white p-6 rounded-t-xl border-b flex flex-col md:flex-row justify-between items-center gap-4 shadow-sm">
+            <div class="text-center md:text-left">
+                <h1 class="text-3xl font-bold text-blue-800">GRUPO MOYA PERÚ</h1>
+                <p class="text-gray-500 text-sm uppercase tracking-widest">Suministros Dentales de Alta Calidad</p>
+            </div>
+            <div class="text-right no-print flex gap-2">
+                <button onclick="window.print()" class="bg-slate-800 hover:bg-black text-white px-4 py-2 rounded-lg transition flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V2h12v7"></path><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+                    Imprimir / PDF
+                </button>
+            </div>
+        </header>
+
+        <main class="bg-white p-6 md:p-10 shadow-lg rounded-b-xl">
+            <!-- Client Info Form -->
+            <section class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10 border-b pb-8">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Cliente / Razón Social</label>
+                    <input type="text" id="clientName" placeholder="Nombre del cliente" class="w-full border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 p-2 border">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">RUC / DNI</label>
+                    <input type="text" id="clientRuc" placeholder="Número de identificación" class="w-full border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 p-2 border">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Fecha</label>
+                    <input type="date" id="quoteDate" class="w-full border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 p-2 border">
+                </div>
+            </section>
+
+            <!-- Product Entry Area -->
+            <section class="no-print mb-8 bg-blue-50 p-6 rounded-xl border border-blue-100">
+                <h2 class="text-lg font-bold text-blue-900 mb-4 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>
+                    Agregar Producto a la Cotización
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="lg:col-span-2">
+                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Producto</label>
+                        <input type="text" id="itemName" placeholder="Ej: Unidad Dental Woodpecker" class="w-full p-2 border rounded shadow-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Precio Unit. Base (S/.)</label>
+                        <input type="number" id="itemPrice" placeholder="0.00" class="w-full p-2 border rounded shadow-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Cantidad</label>
+                        <input type="number" id="itemQty" value="1" min="1" class="w-full p-2 border rounded shadow-sm">
+                    </div>
+                    <div class="lg:col-span-2">
+                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Descripción / Detalles</label>
+                        <textarea id="itemDesc" placeholder="Especificaciones técnicas..." class="w-full p-2 border rounded shadow-sm h-10"></textarea>
+                    </div>
+                    <div class="lg:col-span-2">
+                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">URL de Imagen (Opcional)</label>
+                        <input type="text" id="itemImg" placeholder="https://ejemplo.com/imagen.jpg" class="w-full p-2 border rounded shadow-sm">
+                    </div>
+                    <div class="lg:col-span-4 flex justify-end">
+                        <button onclick="addItem()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg transition shadow-md">
+                            Añadir Producto
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Table of Items -->
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-gray-100 text-gray-700 uppercase text-xs font-bold">
+                            <th class="p-4 border">Imagen</th>
+                            <th class="p-4 border">Descripción Detallada</th>
+                            <th class="p-4 border text-center">Cant.</th>
+                            <th class="p-4 border text-right">Unitario</th>
+                            <th class="p-4 border text-right">Subtotal</th>
+                            <th class="p-4 border text-center no-print">Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody id="itemsBody">
+                        <!-- Items will appear here -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Empty State -->
+            <div id="emptyState" class="text-center py-10 text-gray-400 italic">
+                No hay productos en la cotización.
+            </div>
+
+            <!-- Totals Section -->
+            <section class="mt-8 flex flex-col md:flex-row justify-between gap-8">
+                <div class="md:w-1/2">
+                    <h3 class="font-bold text-gray-700 mb-2">Términos y Condiciones:</h3>
+                    <ul class="text-sm text-gray-600 list-disc ml-4 space-y-1">
+                        <li>Precios incluyen IGV (18%).</li>
+                        <li>Validez de la cotización: 7 días.</li>
+                        <li>Garantía de fábrica según producto.</li>
+                        <li>Forma de pago: Contado / Transferencia.</li>
+                    </ul>
+                </div>
+                <div class="md:w-1/3 bg-slate-50 p-6 rounded-xl border border-slate-200">
+                    <div class="flex justify-between py-2 border-b">
+                        <span class="text-gray-600">Subtotal (S/.):</span>
+                        <span id="subtotalDisplay" class="font-semibold text-gray-800">0.00</span>
+                    </div>
+                    <div class="flex justify-between py-2 border-b">
+                        <span class="text-gray-600">IGV (18%):</span>
+                        <span id="taxDisplay" class="font-semibold text-gray-800">0.00</span>
+                    </div>
+                    <div class="flex justify-between py-3 text-xl font-bold text-blue-900">
+                        <span>TOTAL (S/.):</span>
+                        <span id="totalDisplay">0.00</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Action Buttons -->
+            <footer class="mt-12 flex flex-wrap gap-4 no-print justify-center md:justify-end">
+                <button onclick="sendWhatsApp()" class="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-8 rounded-full flex items-center gap-3 transition transform hover:scale-105 shadow-lg">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" class="text-white"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.438 9.889-9.887.002-5.462-4.415-9.89-9.881-9.891-5.446 0-9.884 4.438-9.887 9.887-.001 2.228.616 3.913 1.784 5.671l-.975 3.563 3.678-.965zm10.188-3.492c-.2.133-1.025.504-1.424.504-.418 0-.583-.245-.583-.245s-.167-.245-.418-.504c-.251-.259-.5-.544-.752-.834-.675-.778-1.123-1.309-1.588-1.993-.338-.497-.133-.768.125-1.066.252-.293.56-.659.847-.98.287-.321.383-.55.578-.916.195-.367.098-.688-.049-.986-.146-.297-1.319-3.186-1.807-4.364-.475-1.147-.954-1.003-1.319-1.003-.343 0-.734-.042-1.123-.042s-1.025.143-1.56.711c-.534.568-2.04 1.994-2.04 4.863 0 2.869 2.087 5.641 2.378 6.031.291.39 4.106 6.269 9.945 8.794 1.39.601 2.475.96 3.324 1.229 1.396.443 2.668.38 3.671.23 1.119-.167 3.441-1.405 3.927-2.763.486-1.358.486-2.523.339-2.763-.146-.24-.537-.383-.733-.516z"/></svg>
+                    Enviar por WhatsApp
+                </button>
+            </footer>
+        </main>
+    </div>
+
+    <!-- User Feedback Message -->
+    <div id="toast" class="fixed bottom-10 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white px-6 py-2 rounded-full opacity-0 transition-opacity duration-300 pointer-events-none z-50">
+        Mensaje copiado
+    </div>
+
+    <script>
+        /**
+         * INSTRUCCIONES PARA SUBIR A LA NUBE:
+         * 1. Guarda este código como un archivo llamado "index.html".
+         * 2. Crea una cuenta en GitHub (github.com).
+         * 3. Crea un nuevo Repositorio llamado "cotizador-moya".
+         * 4. Sube el archivo "index.html" a ese repositorio.
+         * 5. Ve a Settings > Pages y selecciona la rama "main".
+         * 6. ¡Listo! Tendrás una URL como: https://tu-usuario.github.io/cotizador-moya
+         */
+
+        document.getElementById('quoteDate').valueAsDate = new Date();
+
+        let items = [];
+
+        function showToast(text) {
+            const toast = document.getElementById('toast');
+            toast.innerText = text;
+            toast.classList.remove('opacity-0');
+            setTimeout(() => {
+                toast.classList.add('opacity-0');
+            }, 2500);
+        }
+
+        function addItem() {
+            const name = document.getElementById('itemName').value;
+            const price = parseFloat(document.getElementById('itemPrice').value);
+            const qty = parseInt(document.getElementById('itemQty').value);
+            const desc = document.getElementById('itemDesc').value;
+            const img = document.getElementById('itemImg').value;
+
+            if (!name || isNaN(price) || isNaN(qty)) {
+                showToast("Por favor complete nombre, precio y cantidad.");
+                return;
+            }
+
+            const item = {
+                id: Date.now(),
+                name,
+                price,
+                qty,
+                desc,
+                img: img || 'https://via.placeholder.com/100?text=GrupoMoya'
+            };
+
+            items.push(item);
+            renderItems();
+            clearInputs();
+        }
+
+        function clearInputs() {
+            document.getElementById('itemName').value = '';
+            document.getElementById('itemPrice').value = '';
+            document.getElementById('itemQty').value = '1';
+            document.getElementById('itemDesc').value = '';
+            document.getElementById('itemImg').value = '';
+        }
+
+        function removeItem(id) {
+            items = items.filter(item => item.id !== id);
+            renderItems();
+        }
+
+        function renderItems() {
+            const body = document.getElementById('itemsBody');
+            const emptyState = document.getElementById('emptyState');
+            body.innerHTML = '';
+
+            if (items.length === 0) {
+                emptyState.style.display = 'block';
+            } else {
+                emptyState.style.display = 'none';
+            }
+
+            let subtotal = 0;
+
+            items.forEach(item => {
+                const itemSubtotal = item.price * item.qty;
+                subtotal += itemSubtotal;
+
+                const row = document.createElement('tr');
+                row.className = "border-b hover:bg-gray-50 transition";
+                row.innerHTML = `
+                    <td class="p-4 border align-top text-center w-24">
+                        <img src="${item.img}" alt="Producto" class="w-20 h-20 object-contain rounded border bg-white mx-auto">
+                    </td>
+                    <td class="p-4 border align-top">
+                        <div class="font-bold text-blue-800">${item.name}</div>
+                        <div class="text-sm text-gray-500 whitespace-pre-wrap mt-1">${item.desc}</div>
+                    </td>
+                    <td class="p-4 border align-top text-center font-semibold">
+                        ${item.qty}
+                    </td>
+                    <td class="p-4 border align-top text-right text-gray-700">
+                        S/. ${item.price.toFixed(2)}
+                    </td>
+                    <td class="p-4 border align-top text-right font-bold text-gray-800">
+                        S/. ${itemSubtotal.toFixed(2)}
+                    </td>
+                    <td class="p-4 border align-top text-center no-print">
+                        <button onclick="removeItem(${item.id})" class="text-red-500 hover:text-red-700 p-2 transition">
+                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                        </button>
+                    </td>
+                `;
+                body.appendChild(row);
+            });
+
+            const tax = subtotal * 0.18;
+            const total = subtotal + tax;
+
+            document.getElementById('subtotalDisplay').innerText = subtotal.toFixed(2);
+            document.getElementById('taxDisplay').innerText = tax.toFixed(2);
+            document.getElementById('totalDisplay').innerText = total.toFixed(2);
+        }
+
+        function sendWhatsApp() {
+            if (items.length === 0) {
+                showToast("Agregue productos primero.");
+                return;
+            }
+
+            const client = document.getElementById('clientName').value || "Cliente";
+            const ruc = document.getElementById('clientRuc').value || "---";
+            const date = document.getElementById('quoteDate').value;
+            const subtotal = document.getElementById('subtotalDisplay').innerText;
+            const tax = document.getElementById('taxDisplay').innerText;
+            const total = document.getElementById('totalDisplay').innerText;
+
+            let message = `🦷 *GRUPO MOYA PERÚ - COTIZACIÓN*\n`;
+            message += `-------------------------------------------\n`;
+            message += `👤 *Cliente:* ${client}\n`;
+            message += `🆔 *RUC/DNI:* ${ruc}\n`;
+            message += `📅 *Fecha:* ${date}\n\n`;
+            message += `*Detalle de Productos:*\n`;
+
+            items.forEach((item, index) => {
+                message += `🔹 ${item.name} (Cant: ${item.qty})\n   Precio: S/. ${item.price.toFixed(2)} | Subt: S/. ${(item.price * item.qty).toFixed(2)}\n`;
+            });
+
+            message += `\n-------------------------------------------\n`;
+            message += `*Subtotal:* S/. ${subtotal}\n`;
+            message += `*IGV (18%):* S/. ${tax}\n`;
+            message += `*TOTAL:* S/. ${total}\n`;
+            message += `-------------------------------------------\n`;
+            message += `¡Gracias por su consulta! 🏥`;
+
+            const encodedMessage = encodeURIComponent(message);
+            window.open(`https://wa.me/?text=${encodedMessage}`, '_blank');
+        }
+    </script>
+</body>
+</html>
